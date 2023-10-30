@@ -3,7 +3,7 @@
 function filter_by_x(file)
     local xs = {}
     for line in io.lines(file) do 
-        newline = line:gmatch("[^%s]*%d%s")() -- x coordinates in the file uniquely will have no leading spaces and will end with a decimal number and then a space
+        local newline = line:gmatch("[^%s]*%d%s")() -- x coordinates in the file uniquely will have no leading spaces and will end with a decimal number and then a space
         xs[#xs + 1] = newline
     end
     return xs
@@ -13,7 +13,7 @@ end
 function max(t)
     local max = tonumber(t[1])
     for i = 2, #t do
-        compare_val = tonumber(t[i])
+        local compare_val = tonumber(t[i])
         if max < compare_val then
             max = compare_val
         end
@@ -25,7 +25,7 @@ end
 function min(t)
     local min = tonumber(t[1])
     for i = 2, #t do
-        compare_val = tonumber(t[i])
+        local compare_val = tonumber(t[i])
         if min > compare_val then
             min = compare_val
         end
@@ -36,16 +36,16 @@ end
 -- generates a table of cutpoints for a given number of bins with a given percent overlap.
 -- the input table `t` should be a 1D table of coordinates; i.e., the output of the coordinate filter function.
 function get_bins(t, num_bins, percent_overlap)
-    bins = {}
-    max = max(t)
-    min = min(t)
-    og_length = (max-min)/num_bins -- this is the bin size if there is zero percent overlap
-    nudge = og_length*percent_overlap/(200-percent_overlap) -- nudge value is obtained by solving this equation: nudge = (1/2)(percent_overlap/100)(og_length + nudge) (the 1/2 comes from needing to nudge both endpoints)
+    local bins = {}
+    local max = max(t)
+    local min = min(t)
+    local og_length = (max-min)/num_bins -- this is the bin size if there is zero percent overlap
+    local nudge = og_length*percent_overlap/(200-percent_overlap) -- nudge value is obtained by solving this equation: nudge = (1/2)(percent_overlap/100)(og_length + nudge) (the 1/2 comes from needing to nudge both endpoints)
     bins[0] = {min, og_length+nudge+min} -- endpoints don't get nudged
     bins[1] = {max-og_length-nudge, max}
     for j=1,num_bins-2 do -- rest of the endpoints
-        left_end = j*og_length + min - nudge -- nudge left
-        right_end = (j+1)*og_length + min + nudge -- nudge right
+        local left_end = j*og_length + min - nudge -- nudge left
+        local right_end = (j+1)*og_length + min + nudge -- nudge right
         bins[#bins+1] = {left_end, right_end} -- save
     end
     
@@ -69,8 +69,8 @@ end
 -- input file should be a .txt from knotplot after cutting according to some bin.
 function make_vertices(file)
     local vertices = {}
-    vertex_id, bead_id = 0 -- keeps track of vertices/connected components
-    bead_id = 0 -- keeps track of beads within vertices/connected components
+    local vertex_id, bead_id = 0 -- keeps track of vertices/connected components
+    local bead_id = 0 -- keeps track of beads within vertices/connected components
     vertices[vertex_id] = {} -- initialize the first vertex
     for line in io.lines(file) do 
         if line == "" then -- a blank line means we have left a connected component and need to create a new vertex
@@ -90,7 +90,7 @@ end
 -- TODO: optimize for the case where the filters are projections. no need to compare everything to everything in that case
 -- n^2 complexity still needed for general filtering
 function make_adj_list(vertices)
-    adj_list = {}
+    local adj_list = {}
     for vertex, beads in pairs(vertices) do
         adj_list[vertex] = {} -- initialize vertex as a table
         for vertex2, beads2 in pairs(vertices) do
@@ -110,9 +110,9 @@ end
 -- `adj_list` should be a 2D table, where each "vertex" is a table that contains binary entries corresponding to adjacencies to other vertices.
 -- I can phrase that better I guess. whatever the previous function makes such a list so it's ok
 function get_amat_string(adj_list)
-    res = ""
-    n = #adj_list
-    j = 0 -- the first entry is on the diagonal and not counted as a part of the lower triangle
+    local res = ""
+    local n = #adj_list
+    local j = 0 -- the first entry is on the diagonal and not counted as a part of the lower triangle
     for k, v in pairs(adj_list) do
         for i = 1, j do
             res = res .. adj_list[k][i] -- do the thing
@@ -120,7 +120,7 @@ function get_amat_string(adj_list)
         j = j + 1 -- the triangle grows
     end
 
-    num_zero_pads = 6-(n*(n-1)/2 % 6) -- I did it the other way at first but trust me this is the right math
+    local num_zero_pads = 6-(n*(n-1)/2 % 6) -- I did it the other way at first but trust me this is the right math
     for i = 1, num_zero_pads do
         res = res .. 0
     end
@@ -142,7 +142,7 @@ local function convert_to_binary(decimal)
 	end
     n = #binary
 
-    num_zero_pads = 0
+    local num_zero_pads = 0
 
     if n > 18 then
         num_zero_pads = 36 - n
@@ -159,7 +159,7 @@ end
 
 -- another helper for the graph6 function. implements the R(x) function seen in the link.
 function ascii_rep(amat)
-    res = ""
+    local res = ""
     for str in amat:gmatch("......") do
         res = res .. string.char(tonumber(str, 2) + 63) -- interpret as binary
     end
@@ -168,8 +168,8 @@ end
 
 -- see https://users.cecs.anu.edu.au/~bdm/data/formats.txt for more details on graph6
 function graph6(vertices)
-    n = #vertices
-    order_info = ""
+    local n = #vertices
+    local order_info = ""
     if n < 2^6 then
         order_info = string.char(n + 63)
     elseif n < (2^12 * 63) then
@@ -177,50 +177,50 @@ function graph6(vertices)
     else
         order_info = "~~" .. ascii_rep(convert_to_binary(n))
     end
-    amat = get_amat_string(make_adj_list(vertices))
+    local amat = get_amat_string(make_adj_list(vertices))
     res = order_info .. ascii_rep(amat)
     return res
 end
 
 if #arg == 2 then
 
-    num_bins = arg[1]
-    percent_overlap = arg[2]
+    local num_bins = arg[1]
+    local percent_overlap = arg[2]
 
     executeKP([[
         save fullknot.txt
     ]])
 
     local knot = 'fullknot.txt'
-    bins = get_bins(filter_by_x(knot), num_bins, percent_overlap)
-    bin_num = 0
+    local bins = get_bins(filter_by_x(knot), num_bins, percent_overlap)
+    local bin_num = 0
     for bin, endpoints in pairs(bins) do
-        flag = 0
+        local flag = 0
         for k, endpoint in pairs(endpoints) do
             endpoint = tonumber(endpoint)
             if flag == 0 then -- left endpoint
-                com = "cut inside x " .. endpoint
+                local com = "cut inside x " .. endpoint
                 executeKP(com)
                 flag = 1
             else -- right endpoint
-                com = "cut outside x " .. endpoint
+                local com = "cut outside x " .. endpoint
                 executeKP(com)
                 flag = 0
             end
         end
-        filename = "bin" .. bin_num .. ".txt"
-        com = "save " .. filename
+        local filename = "bin" .. bin_num .. ".txt"
+        local com = "save " .. filename
         executeKP(com)
         bin_num = bin_num + 1
         executeKP([[load fullknot.txt]]) -- reload the knot so we can cut again
     end
 
-    vertices = {}
+    local vertices = {}
 
     -- assemble the bins into one vertex table
     for j = 0, num_bins - 1 do
-        bin_file = "bin" .. j .. ".txt"
-        binverts = make_vertices(bin_file)
+        local bin_file = "bin" .. j .. ".txt"
+        local binverts = make_vertices(bin_file)
         for vertex, beads in pairs(binverts) do
             vertices[#vertices + 1] = beads
         end
