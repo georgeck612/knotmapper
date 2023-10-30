@@ -193,7 +193,7 @@ if #arg == 2 then
 
     local knot = 'fullknot.txt'
     bins = get_bins(filter_by_x(knot), num_bins, percent_overlap)
-    bin_num = 0 -- 
+    bin_num = 0
     for bin, endpoints in pairs(bins) do
         flag = 0
         for k, endpoint in pairs(endpoints) do
@@ -208,7 +208,7 @@ if #arg == 2 then
                 flag = 0
             end
         end
-        filename = "bin" .. j .. ".txt"
+        filename = "bin" .. bin_num .. ".txt"
         com = "save " .. filename
         executeKP(com)
         bin_num = bin_num + 1
