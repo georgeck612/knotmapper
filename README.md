@@ -7,3 +7,18 @@ usage: buy Knotplot. download this code. put it in KnotPlot, then load your favo
 `lua run knotmapper/knotmapper.lua [number of bins] [percent overlap]`
 
 You'll get a [graph6](https://users.cecs.anu.edu.au/~bdm/data/formats.txt) representation of the resulting graph. Try using Mathematica to decode it while I write something in Lua to do it.
+
+Examples:
+
+![Example Knot](readmeknot.png)
+
+
+Example knot generated using the `celtic lua` demo in KnotPlot.
+
+
+![Mapper Graph (15 bins, 15% overlap)](15percent.png)
+
+
+Mapper output using 15 bins with 15% overlap, rendered with Mathematica. Note the graph has nine connected components and the knot has 9 strands.
+![Mapper Graph (15 bins, 75% overlap)](75percent.png)
+Mapper output using 15 bins with 75% overlap, also rendered with Mathematica. A little noisier, but kind of vaguely the same.
