@@ -13,7 +13,7 @@ Examples:
 ![Example Knot](readmeknot.png)
 
 
-Example knot generated using the `celtic lua` demo in KnotPlot.
+Example link generated using the `celtic lua` demo in KnotPlot.
 
 
 ![Mapper Graph (15 bins, 15% overlap)](15percent.png)
