@@ -40,9 +40,10 @@ function get_bins(t, num_bins, percent_overlap)
     local max = max(t)
     local min = min(t)
     local og_length = (max-min)/num_bins -- this is the bin size if there is zero percent overlap
-    local nudge = og_length*percent_overlap/(200-percent_overlap) -- nudge value is obtained by solving this equation: nudge = (1/2)(percent_overlap/100)(og_length + nudge) (the 1/2 comes from needing to nudge both endpoints)
-    bins[0] = {min, og_length+nudge+min} -- endpoints don't get nudged
-    bins[1] = {max-og_length-nudge, max}
+    local K = percent_overlap/150
+    local nudge = K*og_length/(2*(1-K)) -- nudge value is obtained by solving this equation: (3/2)nudge = (percent_overlap/100)(og_length + nudge)
+    bins[0] = {min, og_length+2*nudge+min} -- endpoints don't get nudged
+    bins[1] = {max-og_length-2*nudge, max}
     for j=1,num_bins-2 do -- rest of the endpoints
         local left_end = j*og_length + min - nudge -- nudge left
         local right_end = (j+1)*og_length + min + nudge -- nudge right
@@ -87,8 +88,6 @@ function make_vertices(file)
 end
 
 -- constructs the mapper graph. runs with n^2 complexity
--- TODO: optimize for the case where the filters are projections. no need to compare everything to everything in that case
--- n^2 complexity still needed for general filtering
 function make_adj_list(vertices)
     local adj_list = {}
     for vertex, beads in pairs(vertices) do
